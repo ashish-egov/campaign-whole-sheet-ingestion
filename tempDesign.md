@@ -15,7 +15,7 @@ sequenceDiagram
     participant mdms-service
     participant filestore-service
     
-    Client->>ExcelIngestionService: POST /v1/data/_generate<br/>(type: microplan-template-generate)
+    Client->>ExcelIngestionService: POST /v1/data/_generate<br/>(type: microplan-template-generate, referenceId (campaignId))
     
     ExcelIngestionService-->>Client: GenerateResourceResponse<br/>(with resourceId)
     
@@ -57,7 +57,7 @@ sequenceDiagram
     participant filestore-service
     participant mdms-service
     
-    Client->>ExcelIngestionService: POST /v1/data/_process<br/>(type: microplan-ingestion-validate)
+    Client->>ExcelIngestionService: POST /v1/data/_process<br/>(type: microplan-ingestion-validate, referenceId (campaignId), fileStoreId)
     
     ExcelIngestionService-->>Client: ProcessResponse<br/>(with processId)
     
@@ -94,7 +94,7 @@ sequenceDiagram
     participant filestore-service
     participant ProjectFactoryService
     
-    Client->>ExcelIngestionService: POST /v1/data/_process<br/>(type: microplan-ingestion)
+    Client->>ExcelIngestionService: POST /v1/data/_process<br/>(type: microplan-ingestion, referenceId (campaignId), fileStoreId)
     
     ExcelIngestionService-->>Client: ProcessResponse<br/>(with processId)
     
