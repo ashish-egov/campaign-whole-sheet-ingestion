@@ -118,7 +118,15 @@ sequenceDiagram
         Note over Database: - Target Data Rows
         Note over Database: Status: PENDING
         
-        ExcelIngestionService->>Database: Create 7 Process Records
+        Note over ExcelIngestionService: Data Storage Complete
+        ExcelIngestionService->>Database: Update Process Record<br/>(processId, status: IN_PROGRESS)
+        
+        ExcelIngestionService->>ProjectFactoryService: POST /campaign/_create<br/>(Campaign Data + Process Config)
+        
+        Note over ExcelIngestionService: Excel Ingestion Work Complete
+        
+        Note over ProjectFactoryService: Project Factory handles all creation
+        ProjectFactoryService->>Database: Create 7 Process Records
         Note over Database: CampaignProcessTable:
         Note over Database: 1. Facility Create - PENDING
         Note over Database: 2. User Create - PENDING
@@ -128,15 +136,6 @@ sequenceDiagram
         Note over Database: 6. Resource Mapping - PENDING
         Note over Database: 7. Credential Generation - PENDING
         
-        Note over ExcelIngestionService: Data Storage Complete
-        Note over ExcelIngestionService: All processes in PENDING state
-        ExcelIngestionService->>Database: Update Process Record<br/>(processId, status: IN_PROGRESS)
-        
-        ExcelIngestionService->>ProjectFactoryService: POST /campaign/_create<br/>(Campaign Data + Process Config)
-        
-        Note over ExcelIngestionService: Excel Ingestion Work Complete
-        
-        Note over ProjectFactoryService: Project Factory handles all creation
         Note over ProjectFactoryService: - Facility Creation
         Note over ProjectFactoryService: - User Creation  
         Note over ProjectFactoryService: - Project Creation
