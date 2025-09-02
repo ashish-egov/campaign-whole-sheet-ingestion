@@ -1,6 +1,8 @@
 # Unified Microplan Workflow Design
 
 ## 1. Excel Template Generation
+**Type:** `microplan-template-generate`  
+**API:** `POST /v1/data/_generate`
 
 ```mermaid
 sequenceDiagram
@@ -11,7 +13,7 @@ sequenceDiagram
     participant mdms-service
     participant filestore-service
     
-    Client->>ExcelIngestionService: POST /v1/microplan/_generate<br/>(GenerateResourceRequest)
+    Client->>ExcelIngestionService: POST /v1/data/_generate<br/>(type: microplan-template-generate)
     
     ExcelIngestionService->>boundary-service: Fetch Boundary Hierarchy
     boundary-service-->>ExcelIngestionService: Boundary Data
@@ -34,7 +36,9 @@ sequenceDiagram
     ExcelIngestionService-->>Client: GenerateResourceResponse<br/>(with fileStoreId)
 ```
 
-## 2. Validation Process (microplan-ingestion-validate)
+## 2. Validation Process
+**Type:** `microplan-ingestion-validate`  
+**API:** `POST /v1/data/_process`
 
 ```mermaid
 sequenceDiagram
@@ -61,7 +65,9 @@ sequenceDiagram
     ExcelIngestionService-->>Client: ProcessResponse<br/>(with processedFileStoreId)
 ```
 
-## 3. Data Storage & Campaign Creation (microplan-ingestion)
+## 3. Data Storage & Campaign Creation
+**Type:** `microplan-ingestion`  
+**API:** `POST /v1/data/_process`
 
 ```mermaid
 sequenceDiagram
