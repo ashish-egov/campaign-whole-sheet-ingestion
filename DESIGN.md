@@ -49,10 +49,11 @@ sequenceDiagram
     filestore-service-->>ExcelIngestionService: Excel File Data
     
     Note over ExcelIngestionService: Parse Excel Sheets
-    Note over ExcelIngestionService: MDMS Validation
-    Note over ExcelIngestionService: Check User Existence
-    Note over ExcelIngestionService: Validate Boundary Codes in Campaign
-    Note over ExcelIngestionService: Manual Validations
+    Note over ExcelIngestionService: MDMS Schema Validation
+    Note over ExcelIngestionService: Manual Validation
+    Note over ExcelIngestionService: - User Existence Check
+    Note over ExcelIngestionService: - Boundary Code Existence
+    Note over ExcelIngestionService: - Boundary Code in Campaign Selected
     
     ExcelIngestionService->>filestore-service: Upload Processed File
     filestore-service-->>ExcelIngestionService: Processed FileStore ID
