@@ -61,7 +61,7 @@ sequenceDiagram
     ExcelIngestionService-->>Client: ProcessResponse<br/>(with processedFileStoreId)
 ```
 
-## 3. Campaign Creation Process (microplan-ingestion)
+## 3. Data Storage & Campaign Creation (microplan-ingestion)
 
 ```mermaid
 sequenceDiagram
@@ -70,9 +70,7 @@ sequenceDiagram
     participant filestore-service
     participant CampaignDataTable
     participant CampaignProcessTable
-    participant FacilityService
-    participant UserService
-    participant ProjectService
+    participant ProjectFactoryService
     
     Client->>ExcelIngestionService: POST /v1/data/_process<br/>(type: microplan-ingestion)
     
@@ -96,23 +94,20 @@ sequenceDiagram
     Note over CampaignProcessTable: 6. Resource Mapping - PENDING
     Note over CampaignProcessTable: 7. Credential Generation - PENDING
     
-    loop For Each Process
-        Note over ExcelIngestionService: Start Process 1: Facility Create
-        ExcelIngestionService->>CampaignDataTable: Get Facility Data Rows
-        ExcelIngestionService->>FacilityService: Create Facilities
-        FacilityService-->>ExcelIngestionService: Facility Created
-        ExcelIngestionService->>CampaignDataTable: Mark Facility Rows as CREATED
-        ExcelIngestionService->>CampaignProcessTable: Mark Process 1 as DONE
-        
-        Note over ExcelIngestionService: Start Process 2: User Create
-        ExcelIngestionService->>CampaignDataTable: Get User Data Rows
-        ExcelIngestionService->>UserService: Create Users
-        UserService-->>ExcelIngestionService: Users Created
-        ExcelIngestionService->>CampaignDataTable: Mark User Rows as CREATED
-        ExcelIngestionService->>CampaignProcessTable: Mark Process 2 as DONE
-        
-        Note over ExcelIngestionService: Continue for remaining 5 processes...
-    end
+    Note over ExcelIngestionService: Data Storage Complete
+    Note over ExcelIngestionService: All processes in PENDING state
     
-    ExcelIngestionService-->>Client: Campaign Created Successfully<br/>(All Processes Completed)
+    ExcelIngestionService->>ProjectFactoryService: POST /campaign/_create<br/>(Campaign Data + Process Config)
+    
+    Note over ProjectFactoryService: Project Factory handles all creation
+    Note over ProjectFactoryService: - Facility Creation
+    Note over ProjectFactoryService: - User Creation  
+    Note over ProjectFactoryService: - Project Creation
+    Note over ProjectFactoryService: - All Mappings
+    Note over ProjectFactoryService: - Credential Generation
+    Note over ProjectFactoryService: Updates tables as processes complete
+    
+    ProjectFactoryService-->>ExcelIngestionService: Campaign Creation Response
+    
+    ExcelIngestionService-->>Client: Campaign Created Successfully<br/>(Project Factory Processing Started)
 ```
