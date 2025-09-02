@@ -130,9 +130,11 @@ sequenceDiagram
         
         Note over ExcelIngestionService: Data Storage Complete
         Note over ExcelIngestionService: All processes in PENDING state
-        ExcelIngestionService->>Database: Update Process Record<br/>(processId, campaignId, status: COMPLETED)
+        ExcelIngestionService->>Database: Update Process Record<br/>(processId, status: IN_PROGRESS)
         
         ExcelIngestionService->>ProjectFactoryService: POST /campaign/_create<br/>(Campaign Data + Process Config)
+        
+        Note over ExcelIngestionService: Excel Ingestion Work Complete
         
         Note over ProjectFactoryService: Project Factory handles all creation
         Note over ProjectFactoryService: - Facility Creation
@@ -140,9 +142,7 @@ sequenceDiagram
         Note over ProjectFactoryService: - Project Creation
         Note over ProjectFactoryService: - All Mappings
         Note over ProjectFactoryService: - Credential Generation
-        Note over ProjectFactoryService: Updates Database as processes complete
         
-        ProjectFactoryService-->>ExcelIngestionService: Campaign Creation Response
-        
+        ProjectFactoryService->>Database: Campaign Created in DB<br/>(Updates all process records to COMPLETED)
     end
 ```
