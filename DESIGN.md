@@ -119,7 +119,7 @@ sequenceDiagram
         Note over Database: Status: PENDING
         
         Note over ExcelIngestionService: Data Storage Complete
-        ExcelIngestionService->>Database: Update Process Record<br/>(resourceId, status: IN_PROGRESS)
+        ExcelIngestionService->>Database: Update Process Record<br/>(resourceId, status: COMPLETED)
         
         ExcelIngestionService->>ProjectFactoryService: POST /campaign/_create<br/>(Campaign Data + Process Config + referenceId (campaignId))
         
