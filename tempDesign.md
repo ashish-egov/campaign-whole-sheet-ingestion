@@ -16,6 +16,10 @@ sequenceDiagram
     
     Client->>ExcelIngestionService: POST /v1/data/_generate<br/>(type: microplan-template-generate)
     
+    ExcelIngestionService-->>Client: GenerateResourceResponse<br/>(with resourceId)
+    
+    Note over ExcelIngestionService: Background Processing Started
+    
     ExcelIngestionService->>boundary-service: Fetch Boundary Hierarchy
     boundary-service-->>ExcelIngestionService: Boundary Data
     
@@ -34,7 +38,7 @@ sequenceDiagram
     ExcelIngestionService->>filestore-service: Upload Excel Template
     filestore-service-->>ExcelIngestionService: FileStore ID
     
-    ExcelIngestionService-->>Client: GenerateResourceResponse<br/>(with resourceId)
+    Note over ExcelIngestionService: Template Ready for Download
 ```
 
 ## 2. Validation Process
@@ -51,6 +55,10 @@ sequenceDiagram
     
     Client->>ExcelIngestionService: POST /v1/data/_process<br/>(type: microplan-ingestion-validate)
     
+    ExcelIngestionService-->>Client: ProcessResponse<br/>(with processId)
+    
+    Note over ExcelIngestionService: Background Processing Started
+    
     ExcelIngestionService->>filestore-service: Download Excel File
     filestore-service-->>ExcelIngestionService: Excel File Data
     
@@ -64,7 +72,7 @@ sequenceDiagram
     ExcelIngestionService->>filestore-service: Upload Processed File
     filestore-service-->>ExcelIngestionService: Processed FileStore ID
     
-    ExcelIngestionService-->>Client: ProcessResponse<br/>(with processId)
+    Note over ExcelIngestionService: Validation Complete - Ready for Search
 ```
 
 ## 3. Data Storage & Campaign Creation
@@ -83,13 +91,17 @@ sequenceDiagram
     
     Client->>ExcelIngestionService: POST /v1/data/_process<br/>(type: microplan-ingestion)
     
+    ExcelIngestionService-->>Client: ProcessResponse<br/>(with processId)
+    
+    Note over ExcelIngestionService: Background Processing Started
+    
     ExcelIngestionService->>filestore-service: Download Excel File
     filestore-service-->>ExcelIngestionService: Excel File Data
     
     Note over ExcelIngestionService: Run Above Validation Flow
     
     alt Validation Failed
-        ExcelIngestionService-->>Client: Validation Errors
+        Note over ExcelIngestionService: Process Marked as FAILED
     else Validation Success
     
         Note over ExcelIngestionService: Parse All Sheet Data
@@ -124,6 +136,6 @@ sequenceDiagram
         
         ProjectFactoryService-->>ExcelIngestionService: Campaign Creation Response
         
-        ExcelIngestionService-->>Client: ProcessResponse<br/>(with processId - Campaign Processing Started)
+        Note over ExcelIngestionService: Campaign Processing Complete
     end
 ```
