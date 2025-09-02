@@ -2,7 +2,7 @@
 
 ## 1. Excel Template Generation
 **Type:** `microplan-template-generate`  
-**API:** `POST /v1/data/_generate` (Async - returns resourceId)  
+**API:** `POST /v1/data/_generate` (Async - returns generateResourceId)
 **Download API:** `POST /v1/data/_download` (returns fileStoreId)
 
 ```mermaid
@@ -17,7 +17,7 @@ sequenceDiagram
     
     Client->>ExcelIngestionService: POST /v1/data/_generate<br/>(type: microplan-template-generate, referenceId (campaignId))
     
-    ExcelIngestionService-->>Client: GenerateResourceResponse<br/>(with resourceId)
+    ExcelIngestionService-->>Client: GenerateResourceResponse<br/>(with generateResourceId)
     
     Note over ExcelIngestionService: Background Processing Started
     
@@ -39,14 +39,14 @@ sequenceDiagram
     ExcelIngestionService->>filestore-service: Upload Excel Template
     filestore-service-->>ExcelIngestionService: FileStore ID
     
-    ExcelIngestionService->>Database: Save Template Record<br/>(resourceId, fileStoreId, status: COMPLETED)
+    ExcelIngestionService->>Database: Save Template Record<br/>(generateResourceId, fileStoreId, status: COMPLETED)
     
     Note over ExcelIngestionService: Template Ready for Download
 ```
 
 ## 2. Validation Process
 **Type:** `microplan-ingestion-validate`  
-**API:** `POST /v1/data/_process` (Async - returns processId)  
+**API:** `POST /v1/data/_process` (Async - returns resourceId)
 **Search API:** `POST /v1/data/_search` (returns process status & fileStoreId if complete)
 
 ```mermaid
@@ -59,7 +59,7 @@ sequenceDiagram
     
     Client->>ExcelIngestionService: POST /v1/data/_process<br/>(type: microplan-ingestion-validate, referenceId (campaignId), fileStoreId)
     
-    ExcelIngestionService-->>Client: ProcessResponse<br/>(with processId)
+    ExcelIngestionService-->>Client: ProcessResponse<br/>(with resourceId)
     
     Note over ExcelIngestionService: Background Processing Started
     
@@ -76,7 +76,7 @@ sequenceDiagram
     ExcelIngestionService->>filestore-service: Upload Processed File
     filestore-service-->>ExcelIngestionService: Processed FileStore ID
     
-    ExcelIngestionService->>Database: Save Process Record<br/>(processId, fileStoreId, status: COMPLETED)
+    ExcelIngestionService->>Database: Save Process Record<br/>(resourceId, fileStoreId, status: COMPLETED)
     
     Note over ExcelIngestionService: Validation Complete - Ready for Search
 ```
@@ -119,7 +119,7 @@ sequenceDiagram
         Note over Database: Status: PENDING
         
         Note over ExcelIngestionService: Data Storage Complete
-        ExcelIngestionService->>Database: Update Process Record<br/>(processId, status: IN_PROGRESS)
+        ExcelIngestionService->>Database: Update Process Record<br/>(resourceId, status: IN_PROGRESS)
         
         ExcelIngestionService->>ProjectFactoryService: POST /campaign/_create<br/>(Campaign Data + Process Config + referenceId (campaignId))
         
@@ -155,9 +155,9 @@ sequenceDiagram
     participant ExcelIngestionService
     participant Database
     
-    Client->>ExcelIngestionService: POST /v1/data/_download<br/>(resourceId, referenceId (campaignId))
+    Client->>ExcelIngestionService: POST /v1/data/_download<br/>(generateResourceId, referenceId (campaignId))
     
-    ExcelIngestionService->>Database: Search Template Record<br/>(resourceId, referenceId (campaignId))
+    ExcelIngestionService->>Database: Search Template Record<br/>(generateResourceId, referenceId (campaignId))
     Database-->>ExcelIngestionService: Template Record<br/>(fileStoreId, status)
     
     ExcelIngestionService-->>Client: DownloadResponse<br/>(fileStoreId or status)
@@ -172,9 +172,9 @@ sequenceDiagram
     participant ExcelIngestionService
     participant Database
     
-    Client->>ExcelIngestionService: POST /v1/data/_search<br/>(processId, referenceId (campaignId))
+    Client->>ExcelIngestionService: POST /v1/data/_search<br/>(resourceId, referenceId (campaignId))
     
-    ExcelIngestionService->>Database: Search Process Record<br/>(processId, referenceId (campaignId))
+    ExcelIngestionService->>Database: Search Process Record<br/>(resourceId, referenceId (campaignId))
     Database-->>ExcelIngestionService: Process Record<br/>(status, fileStoreId, referenceId (campaignId))
     
     ExcelIngestionService-->>Client: SearchResponse<br/>(status, data based on type - referenceId (campaignId) for creation)
