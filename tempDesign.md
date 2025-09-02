@@ -9,6 +9,7 @@
 sequenceDiagram
     participant Client
     participant ExcelIngestionService
+    participant Database
     participant boundary-service
     participant localization-service
     participant mdms-service
@@ -38,6 +39,8 @@ sequenceDiagram
     ExcelIngestionService->>filestore-service: Upload Excel Template
     filestore-service-->>ExcelIngestionService: FileStore ID
     
+    ExcelIngestionService->>Database: Save Template Record<br/>(resourceId, fileStoreId, status: COMPLETED)
+    
     Note over ExcelIngestionService: Template Ready for Download
 ```
 
@@ -50,6 +53,7 @@ sequenceDiagram
 sequenceDiagram
     participant Client
     participant ExcelIngestionService
+    participant Database
     participant filestore-service
     participant mdms-service
     
@@ -72,6 +76,8 @@ sequenceDiagram
     ExcelIngestionService->>filestore-service: Upload Processed File
     filestore-service-->>ExcelIngestionService: Processed FileStore ID
     
+    ExcelIngestionService->>Database: Save Process Record<br/>(processId, fileStoreId, status: COMPLETED)
+    
     Note over ExcelIngestionService: Validation Complete - Ready for Search
 ```
 
@@ -84,9 +90,8 @@ sequenceDiagram
 sequenceDiagram
     participant Client
     participant ExcelIngestionService
+    participant Database
     participant filestore-service
-    participant CampaignDataTable
-    participant CampaignProcessTable
     participant ProjectFactoryService
     
     Client->>ExcelIngestionService: POST /v1/data/_process<br/>(type: microplan-ingestion)
@@ -106,20 +111,22 @@ sequenceDiagram
     
         Note over ExcelIngestionService: Parse All Sheet Data
         
-        ExcelIngestionService->>CampaignDataTable: Insert All Data (Temporary Storage)
-        Note over CampaignDataTable: - Facility Data Rows
-        Note over CampaignDataTable: - User Data Rows  
-        Note over CampaignDataTable: - Target Data Rows
-        Note over CampaignDataTable: Status: PENDING
+        ExcelIngestionService->>Database: Insert Campaign Data (Temporary Storage)
+        Note over Database: CampaignDataTable:
+        Note over Database: - Facility Data Rows
+        Note over Database: - User Data Rows  
+        Note over Database: - Target Data Rows
+        Note over Database: Status: PENDING
         
-        ExcelIngestionService->>CampaignProcessTable: Create 7 Processes
-        Note over CampaignProcessTable: 1. Facility Create - PENDING
-        Note over CampaignProcessTable: 2. User Create - PENDING
-        Note over CampaignProcessTable: 3. Project Create - PENDING
-        Note over CampaignProcessTable: 4. Facility Mapping - PENDING
-        Note over CampaignProcessTable: 5. User Mapping - PENDING
-        Note over CampaignProcessTable: 6. Resource Mapping - PENDING
-        Note over CampaignProcessTable: 7. Credential Generation - PENDING
+        ExcelIngestionService->>Database: Create 7 Process Records
+        Note over Database: CampaignProcessTable:
+        Note over Database: 1. Facility Create - PENDING
+        Note over Database: 2. User Create - PENDING
+        Note over Database: 3. Project Create - PENDING
+        Note over Database: 4. Facility Mapping - PENDING
+        Note over Database: 5. User Mapping - PENDING
+        Note over Database: 6. Resource Mapping - PENDING
+        Note over Database: 7. Credential Generation - PENDING
         
         Note over ExcelIngestionService: Data Storage Complete
         Note over ExcelIngestionService: All processes in PENDING state
@@ -132,9 +139,11 @@ sequenceDiagram
         Note over ProjectFactoryService: - Project Creation
         Note over ProjectFactoryService: - All Mappings
         Note over ProjectFactoryService: - Credential Generation
-        Note over ProjectFactoryService: Updates tables as processes complete
+        Note over ProjectFactoryService: Updates Database as processes complete
         
         ProjectFactoryService-->>ExcelIngestionService: Campaign Creation Response
+        
+        ExcelIngestionService->>Database: Update Process Record<br/>(processId, campaignId, status: COMPLETED)
         
         Note over ExcelIngestionService: Campaign Processing Complete
     end
