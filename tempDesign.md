@@ -84,7 +84,7 @@ sequenceDiagram
 ## 3. Data Storage & Campaign Creation
 **Type:** `microplan-ingestion`  
 **API:** `POST /v1/data/_process` (Async - returns processId)  
-**Search API:** `POST /v1/data/_search` (returns process status & campaign details if complete)
+**Search API:** `POST /v1/data/_search` (returns process status & referenceId (campaignId) if complete)
 
 ```mermaid
 sequenceDiagram
@@ -121,7 +121,7 @@ sequenceDiagram
         Note over ExcelIngestionService: Data Storage Complete
         ExcelIngestionService->>Database: Update Process Record<br/>(processId, status: IN_PROGRESS)
         
-        ExcelIngestionService->>ProjectFactoryService: POST /campaign/_create<br/>(Campaign Data + Process Config)
+        ExcelIngestionService->>ProjectFactoryService: POST /campaign/_create<br/>(Campaign Data + Process Config + referenceId (campaignId))
         
         Note over ExcelIngestionService: Excel Ingestion Work Complete
         
@@ -175,7 +175,7 @@ sequenceDiagram
     Client->>ExcelIngestionService: POST /v1/data/_search<br/>(processId)
     
     ExcelIngestionService->>Database: Search Process Record<br/>(processId)
-    Database-->>ExcelIngestionService: Process Record<br/>(status, fileStoreId, campaignId)
+    Database-->>ExcelIngestionService: Process Record<br/>(status, fileStoreId, referenceId (campaignId))
     
-    ExcelIngestionService-->>Client: SearchResponse<br/>(status, data based on type)
+    ExcelIngestionService-->>Client: SearchResponse<br/>(status, data based on type - referenceId (campaignId) for creation)
 ```
