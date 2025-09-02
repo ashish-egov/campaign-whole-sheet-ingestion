@@ -145,3 +145,37 @@ sequenceDiagram
         ProjectFactoryService->>Database: Campaign Created in DB<br/>(Updates all process records to COMPLETED)
     end
 ```
+
+## 4. Download API (For Template Generation)
+**API:** `POST /v1/data/_download`
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant ExcelIngestionService
+    participant Database
+    
+    Client->>ExcelIngestionService: POST /v1/data/_download<br/>(resourceId)
+    
+    ExcelIngestionService->>Database: Search Template Record<br/>(resourceId)
+    Database-->>ExcelIngestionService: Template Record<br/>(fileStoreId, status)
+    
+    ExcelIngestionService-->>Client: DownloadResponse<br/>(fileStoreId or status)
+```
+
+## 5. Search API (For Process Status)
+**API:** `POST /v1/data/_search`
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant ExcelIngestionService
+    participant Database
+    
+    Client->>ExcelIngestionService: POST /v1/data/_search<br/>(processId)
+    
+    ExcelIngestionService->>Database: Search Process Record<br/>(processId)
+    Database-->>ExcelIngestionService: Process Record<br/>(status, fileStoreId, campaignId)
+    
+    ExcelIngestionService-->>Client: SearchResponse<br/>(status, data based on type)
+```
