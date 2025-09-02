@@ -80,40 +80,47 @@ sequenceDiagram
     
     Client->>ExcelIngestionService: POST /v1/data/_process<br/>(type: microplan-ingestion)
     
-    ExcelIngestionService->>filestore-service: Download Processed File
-    filestore-service-->>ExcelIngestionService: Processed File Data
+    ExcelIngestionService->>filestore-service: Download Excel File
+    filestore-service-->>ExcelIngestionService: Excel File Data
     
-    Note over ExcelIngestionService: Parse All Sheet Data
+    Note over ExcelIngestionService: Run Above Validation Flow
     
-    ExcelIngestionService->>CampaignDataTable: Insert All Data (Temporary Storage)
-    Note over CampaignDataTable: - Facility Data Rows
-    Note over CampaignDataTable: - User Data Rows  
-    Note over CampaignDataTable: - Target Data Rows
-    Note over CampaignDataTable: Status: PENDING
+    alt Validation Failed
+        ExcelIngestionService-->>Client: Validation Errors
+    else Validation Success
     
-    ExcelIngestionService->>CampaignProcessTable: Create 7 Processes
-    Note over CampaignProcessTable: 1. Facility Create - PENDING
-    Note over CampaignProcessTable: 2. User Create - PENDING
-    Note over CampaignProcessTable: 3. Project Create - PENDING
-    Note over CampaignProcessTable: 4. Facility Mapping - PENDING
-    Note over CampaignProcessTable: 5. User Mapping - PENDING
-    Note over CampaignProcessTable: 6. Resource Mapping - PENDING
-    Note over CampaignProcessTable: 7. Credential Generation - PENDING
-    
-    Note over ExcelIngestionService: Data Storage Complete
-    Note over ExcelIngestionService: All processes in PENDING state
-    
-    ExcelIngestionService->>ProjectFactoryService: POST /campaign/_create<br/>(Campaign Data + Process Config)
-    
-    Note over ProjectFactoryService: Project Factory handles all creation
-    Note over ProjectFactoryService: - Facility Creation
-    Note over ProjectFactoryService: - User Creation  
-    Note over ProjectFactoryService: - Project Creation
-    Note over ProjectFactoryService: - All Mappings
-    Note over ProjectFactoryService: - Credential Generation
-    Note over ProjectFactoryService: Updates tables as processes complete
-    
-    ProjectFactoryService-->>ExcelIngestionService: Campaign Creation Response
-    
-    ExcelIngestionService-->>Client: Campaign Created Successfully<br/>(Project Factory Processing Started)
+        Note over ExcelIngestionService: Parse All Sheet Data
+        
+        ExcelIngestionService->>CampaignDataTable: Insert All Data (Temporary Storage)
+        Note over CampaignDataTable: - Facility Data Rows
+        Note over CampaignDataTable: - User Data Rows  
+        Note over CampaignDataTable: - Target Data Rows
+        Note over CampaignDataTable: Status: PENDING
+        
+        ExcelIngestionService->>CampaignProcessTable: Create 7 Processes
+        Note over CampaignProcessTable: 1. Facility Create - PENDING
+        Note over CampaignProcessTable: 2. User Create - PENDING
+        Note over CampaignProcessTable: 3. Project Create - PENDING
+        Note over CampaignProcessTable: 4. Facility Mapping - PENDING
+        Note over CampaignProcessTable: 5. User Mapping - PENDING
+        Note over CampaignProcessTable: 6. Resource Mapping - PENDING
+        Note over CampaignProcessTable: 7. Credential Generation - PENDING
+        
+        Note over ExcelIngestionService: Data Storage Complete
+        Note over ExcelIngestionService: All processes in PENDING state
+        
+        ExcelIngestionService->>ProjectFactoryService: POST /campaign/_create<br/>(Campaign Data + Process Config)
+        
+        Note over ProjectFactoryService: Project Factory handles all creation
+        Note over ProjectFactoryService: - Facility Creation
+        Note over ProjectFactoryService: - User Creation  
+        Note over ProjectFactoryService: - Project Creation
+        Note over ProjectFactoryService: - All Mappings
+        Note over ProjectFactoryService: - Credential Generation
+        Note over ProjectFactoryService: Updates tables as processes complete
+        
+        ProjectFactoryService-->>ExcelIngestionService: Campaign Creation Response
+        
+        ExcelIngestionService-->>Client: Campaign Created Successfully<br/>(Project Factory Processing Started)
+    end
 ```
