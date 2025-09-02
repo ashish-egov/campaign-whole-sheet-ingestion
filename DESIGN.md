@@ -68,7 +68,8 @@ sequenceDiagram
     participant Client
     participant ExcelIngestionService
     participant filestore-service
-    participant CampaignService
+    participant CampaignDataTable
+    participant CampaignProcessTable
     participant FacilityService
     participant UserService
     participant ProjectService
@@ -78,22 +79,40 @@ sequenceDiagram
     ExcelIngestionService->>filestore-service: Download Processed File
     filestore-service-->>ExcelIngestionService: Processed File Data
     
-    Note over ExcelIngestionService: Final Validation
+    Note over ExcelIngestionService: Parse All Sheet Data
     
-    alt Validation Success
-        ExcelIngestionService->>CampaignService: Create Campaign
-        CampaignService-->>ExcelIngestionService: Campaign ID
+    ExcelIngestionService->>CampaignDataTable: Insert All Data (Temporary Storage)
+    Note over CampaignDataTable: - Facility Data Rows
+    Note over CampaignDataTable: - User Data Rows  
+    Note over CampaignDataTable: - Target Data Rows
+    Note over CampaignDataTable: Status: PENDING
+    
+    ExcelIngestionService->>CampaignProcessTable: Create 7 Processes
+    Note over CampaignProcessTable: 1. Facility Create - PENDING
+    Note over CampaignProcessTable: 2. User Create - PENDING
+    Note over CampaignProcessTable: 3. Project Create - PENDING
+    Note over CampaignProcessTable: 4. Facility Mapping - PENDING
+    Note over CampaignProcessTable: 5. User Mapping - PENDING
+    Note over CampaignProcessTable: 6. Resource Mapping - PENDING
+    Note over CampaignProcessTable: 7. Credential Generation - PENDING
+    
+    loop For Each Process
+        Note over ExcelIngestionService: Start Process 1: Facility Create
+        ExcelIngestionService->>CampaignDataTable: Get Facility Data Rows
+        ExcelIngestionService->>FacilityService: Create Facilities
+        FacilityService-->>ExcelIngestionService: Facility Created
+        ExcelIngestionService->>CampaignDataTable: Mark Facility Rows as CREATED
+        ExcelIngestionService->>CampaignProcessTable: Mark Process 1 as DONE
         
-        ExcelIngestionService->>FacilityService: 1️⃣ Create Facilities
-        ExcelIngestionService->>UserService: 2️⃣ Create Users
-        ExcelIngestionService->>ProjectService: 3️⃣ Create Projects
-        ExcelIngestionService->>FacilityService: 4️⃣ Map Facilities
-        ExcelIngestionService->>UserService: 5️⃣ Map Users
-        ExcelIngestionService->>ProjectService: 6️⃣ Map Resources
-        ExcelIngestionService->>UserService: 7️⃣ Generate Credentials
+        Note over ExcelIngestionService: Start Process 2: User Create
+        ExcelIngestionService->>CampaignDataTable: Get User Data Rows
+        ExcelIngestionService->>UserService: Create Users
+        UserService-->>ExcelIngestionService: Users Created
+        ExcelIngestionService->>CampaignDataTable: Mark User Rows as CREATED
+        ExcelIngestionService->>CampaignProcessTable: Mark Process 2 as DONE
         
-        ExcelIngestionService-->>Client: Campaign Created Successfully
-    else Validation Failed
-        ExcelIngestionService-->>Client: Validation Errors
+        Note over ExcelIngestionService: Continue for remaining 5 processes...
     end
+    
+    ExcelIngestionService-->>Client: Campaign Created Successfully<br/>(All Processes Completed)
 ```
