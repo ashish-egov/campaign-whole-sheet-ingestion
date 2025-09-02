@@ -3,7 +3,7 @@
 ## 1. Excel Template Generation
 **Type:** `microplan-template-generate`  
 **API:** `POST /v1/data/_generate` (Async - returns resourceId)  
-**Download API:** `GET /v1/data/_download?resourceId={id}` (returns fileStoreId)
+**Download API:** `POST /v1/data/_download` (returns fileStoreId)
 
 ```mermaid
 sequenceDiagram
@@ -47,7 +47,7 @@ sequenceDiagram
 ## 2. Validation Process
 **Type:** `microplan-ingestion-validate`  
 **API:** `POST /v1/data/_process` (Async - returns processId)  
-**Search API:** `GET /v1/data/_search?processId={id}` (returns process status & fileStoreId if complete)
+**Search API:** `POST /v1/data/_search` (returns process status & fileStoreId if complete)
 
 ```mermaid
 sequenceDiagram
@@ -84,7 +84,7 @@ sequenceDiagram
 ## 3. Data Storage & Campaign Creation
 **Type:** `microplan-ingestion`  
 **API:** `POST /v1/data/_process` (Async - returns processId)  
-**Search API:** `GET /v1/data/_search?processId={id}` (returns process status & campaign details if complete)
+**Search API:** `POST /v1/data/_search` (returns process status & campaign details if complete)
 
 ```mermaid
 sequenceDiagram
