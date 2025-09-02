@@ -155,9 +155,9 @@ sequenceDiagram
     participant ExcelIngestionService
     participant Database
     
-    Client->>ExcelIngestionService: POST /v1/data/_download<br/>(resourceId)
+    Client->>ExcelIngestionService: POST /v1/data/_download<br/>(resourceId, referenceId (campaignId))
     
-    ExcelIngestionService->>Database: Search Template Record<br/>(resourceId)
+    ExcelIngestionService->>Database: Search Template Record<br/>(resourceId, referenceId (campaignId))
     Database-->>ExcelIngestionService: Template Record<br/>(fileStoreId, status)
     
     ExcelIngestionService-->>Client: DownloadResponse<br/>(fileStoreId or status)
@@ -172,9 +172,9 @@ sequenceDiagram
     participant ExcelIngestionService
     participant Database
     
-    Client->>ExcelIngestionService: POST /v1/data/_search<br/>(processId)
+    Client->>ExcelIngestionService: POST /v1/data/_search<br/>(processId, referenceId (campaignId))
     
-    ExcelIngestionService->>Database: Search Process Record<br/>(processId)
+    ExcelIngestionService->>Database: Search Process Record<br/>(processId, referenceId (campaignId))
     Database-->>ExcelIngestionService: Process Record<br/>(status, fileStoreId, referenceId (campaignId))
     
     ExcelIngestionService-->>Client: SearchResponse<br/>(status, data based on type - referenceId (campaignId) for creation)
