@@ -92,56 +92,43 @@ sequenceDiagram
     participant ExcelIngestionService
     participant Database
     participant filestore-service
-    participant ProjectFactoryService
-    
+
     Client->>ExcelIngestionService: POST /v1/data/_process<br/>(type: microplan-ingestion, referenceId (campaignId), fileStoreId)
-    
     ExcelIngestionService-->>Client: ProcessResponse<br/>(with processId)
-    
     Note over ExcelIngestionService: Background Processing Started
-    
+
     ExcelIngestionService->>filestore-service: Download Excel File
     filestore-service-->>ExcelIngestionService: Excel File Data
-    
+
     Note over ExcelIngestionService: Run Above Validation Flow
-    
+
     alt Validation Failed
         Note over ExcelIngestionService: Process Marked as FAILED
     else Validation Success
-    
         Note over ExcelIngestionService: Parse All Sheet Data
-        
         ExcelIngestionService->>Database: Insert Campaign Data (Temporary Storage)
-        Note over Database: CampaignDataTable:
-        Note over Database: - Facility Data Rows
-        Note over Database: - User Data Rows  
-        Note over Database: - Target Data Rows
-        Note over Database: Status: PENDING
-        
-        Note over ExcelIngestionService: Data Storage Complete
-        ExcelIngestionService->>ProjectFactoryService: POST /campaign/_create<br/>(Campaign Data + Process Config + referenceId (campaignId))
-        ExcelIngestionService->>Database: Update Process Record<br/>(resourceId, status: COMPLETED)
-        
+        Note over Database: CampaignDataTable:<br/>- Facility Data Rows<br/>- User Data Rows<br/>- Target Data Rows<br/>Status: PENDING
+
+        Note over ExcelIngestionService: Start Sequential Processing
+
+        loop For Each Facility
+            ExcelIngestionService->>Database: Create Facility Record<br/>Update Row → COMPLETED
+        end
+
+        loop For Each User
+            ExcelIngestionService->>Database: Create User Record<br/>Update Row → COMPLETED
+        end
+
+        loop For Each Project
+            ExcelIngestionService->>Database: Create Project Record<br/>Update Row → COMPLETED
+        end
+
+        loop For Each Mapping
+            ExcelIngestionService->>Database: Create Mapping Record<br/>Update Row → COMPLETED
+        end
+
+        ExcelIngestionService->>Database: Update Process Record<br/>(status: COMPLETED)
         Note over ExcelIngestionService: Excel Ingestion Work Complete
-        
-        Note over ProjectFactoryService: Project Factory handles all creation
-        ProjectFactoryService->>Database: Create 7 Process Records
-        Note over Database: CampaignProcessTable:
-        Note over Database: 1. Facility Create - PENDING
-        Note over Database: 2. User Create - PENDING
-        Note over Database: 3. Project Create - PENDING
-        Note over Database: 4. Facility Mapping - PENDING
-        Note over Database: 5. User Mapping - PENDING
-        Note over Database: 6. Resource Mapping - PENDING
-        Note over Database: 7. Credential Generation - PENDING
-        
-        Note over ProjectFactoryService: - Facility Creation
-        Note over ProjectFactoryService: - User Creation  
-        Note over ProjectFactoryService: - Project Creation
-        Note over ProjectFactoryService: - All Mappings
-        Note over ProjectFactoryService: - Credential Generation
-        
-        ProjectFactoryService->>Database: Campaign Created in DB<br/>(Updates all process records to COMPLETED)
     end
 ```
 
