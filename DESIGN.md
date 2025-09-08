@@ -221,4 +221,74 @@ CREATE TABLE eg_ex_in_sheet_data (
 );
 ```
 
+## 7. Generated Files Table Documentation
+**Table Name:** `eg_ex_in_generated_files`
+
+This table stores metadata for all generated files (templates, validation reports, processed files) for download purposes.
+
+### Database Schema Diagram
+```mermaid
+erDiagram
+    eg_ex_in_generated_files {
+        VARCHAR(100) resourceId PK "Unique resource identifier"
+        VARCHAR(100) referenceId "Campaign/Process reference ID"
+        VARCHAR(50) type "File type (template/validation-report/processed)"
+        VARCHAR(200) fileStoreId "FileStore service ID for download"
+        VARCHAR(20) status "PENDING/FAILED/COMPLETED"
+        TEXT errorDetails "Error details if failed"
+        JSONB metadata "Additional metadata as JSON"
+        VARCHAR(100) createdBy "Creator user/system"
+        VARCHAR(100) lastModifiedBy "Last modifier"
+        BIGINT createdTime "Creation epoch seconds"
+        BIGINT lastModifiedTime "Last modified epoch"
+    }
+    
+    eg_ex_in_generated_files ||--o{ Campaign : "references"
+    eg_ex_in_generated_files ||--o{ FileStore : "stores in"
+```
+
+### Column Details
+| Column | Type | Description |
+|--------|------|-------------|
+| resourceId | VARCHAR(100) PRIMARY KEY | Unique identifier for the generated resource |
+| referenceId | VARCHAR(100) NOT NULL | Campaign or process reference ID |
+| type | VARCHAR(50) NOT NULL | Type of file (microplan-template/validation-report/processed-excel) |
+| fileStoreId | VARCHAR(200) | FileStore service ID for downloading the file |
+| status | VARCHAR(20) NOT NULL | Generation status → PENDING, FAILED, COMPLETED |
+| errorDetails | TEXT | Error details if generation failed |
+| metadata | JSONB | Additional metadata (file size, sheets count, validation summary) |
+| createdBy | VARCHAR(100) | User/system who initiated generation |
+| lastModifiedBy | VARCHAR(100) | User/system who last modified |
+| createdTime | BIGINT | Creation timestamp in epoch seconds |
+| lastModifiedTime | BIGINT | Last modification timestamp in epoch seconds |
+
+### Purpose & Usage
+- **File Tracking:** Track all generated files (templates, validation reports)
+- **Download Management:** Store fileStoreId for download API
+- **Status Monitoring:** Track generation status for async operations
+- **Error Handling:** Store error details for failed generations
+- **Audit Trail:** Maintain complete audit details for compliance
+
+### Example: SQL Create Table Script
+```sql
+CREATE TABLE eg_ex_in_generated_files (
+    resourceId VARCHAR(100) PRIMARY KEY,
+    referenceId VARCHAR(100) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    fileStoreId VARCHAR(200),
+    status VARCHAR(20) NOT NULL,
+    errorDetails TEXT,
+    metadata JSONB,
+    createdBy VARCHAR(100),
+    lastModifiedBy VARCHAR(100),
+    createdTime BIGINT,
+    lastModifiedTime BIGINT
+);
+
+-- Index for faster lookups
+CREATE INDEX idx_generated_files_reference ON eg_ex_in_generated_files(referenceId);
+CREATE INDEX idx_generated_files_type ON eg_ex_in_generated_files(type);
+CREATE INDEX idx_generated_files_status ON eg_ex_in_generated_files(status);
+```
+
 
