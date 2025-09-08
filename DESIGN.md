@@ -172,6 +172,39 @@ sequenceDiagram
 This table provides row-wise temporary storage for the Excel ingestion workflow.
 Each row represents a record from an Excel sheet, linked to a campaign/process.
 
+### Database Schema Diagram
+```mermaid
+erDiagram
+    eg_ex_in_sheet_data {
+        VARCHAR(100) referenceId PK "Campaign/Process Reference ID"
+        TEXT uniqueIdentifier PK "Unique key per row"
+        VARCHAR(50) type PK "Sheet type (Facility/User/Target)"
+        JSONB rowData "Full Excel row data as JSON"
+        VARCHAR(20) status "PENDING/FAILED/COMPLETED"
+        BIGINT deleteTime "Expiry epoch (NULL=permanent)"
+        VARCHAR(100) createdBy "Creator user/system"
+        VARCHAR(100) lastModifiedBy "Last modifier"
+        BIGINT createdTime "Creation epoch seconds"
+        BIGINT lastModifiedTime "Last modified epoch"
+    }
+    
+    eg_ex_in_sheet_data ||--o{ Campaign : "references"
+    eg_ex_in_sheet_data ||--o{ Process : "belongs to"
+    
+    Campaign {
+        VARCHAR(100) campaignId PK
+        VARCHAR name
+        VARCHAR status
+    }
+    
+    Process {
+        VARCHAR(100) processId PK
+        VARCHAR(100) referenceId FK
+        VARCHAR type
+        VARCHAR status
+    }
+```
+
 ### Column Details
 | Column | Type | Description |
 |--------|------|-------------|
@@ -179,7 +212,7 @@ Each row represents a record from an Excel sheet, linked to a campaign/process.
 | uniqueIdentifier | TEXT NOT NULL | Unique key per row (single/composite/custom). |
 | type | VARCHAR(50) NOT NULL | Sheet type (e.g., Facility, User, Target). |
 | rowData | JSONB NOT NULL | Full row data from Excel sheet, stored as JSON. |
-| status | VARCHAR(20) NOT NULL | Row processing status → PENDING, PASSED, FAILED. |
+| status | VARCHAR(20) NOT NULL | Row processing status → PENDING, FAILED, COMPLETED. |
 | deleteTime | BIGINT | Expiry timestamp in epoch seconds. NULL = permanent row. |
 | createdBy | VARCHAR(100) | User/system who created the row. |
 | lastModifiedBy | VARCHAR(100) | User/system who last modified the row. |
