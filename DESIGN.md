@@ -165,3 +165,56 @@ sequenceDiagram
     
     ExcelIngestionService-->>Client: SearchResponse<br/>(status, data based on type - referenceId (campaignId) for creation)
 ```
+
+## 6. Sheet Data Table Documentation
+**Table Name:** `eg_ex_in_sheet_data`
+
+This table provides row-wise temporary storage for the Excel ingestion workflow.
+Each row represents a record from an Excel sheet, linked to a campaign/process.
+
+### Column Details
+| Column | Type | Description |
+|--------|------|-------------|
+| referenceId | VARCHAR(100) NOT NULL | Campaign or process reference ID (scope of ingestion). |
+| uniqueIdentifier | TEXT NOT NULL | Unique key per row (single/composite/custom). |
+| type | VARCHAR(50) NOT NULL | Sheet type (e.g., Facility, User, Target). |
+| rowData | JSONB NOT NULL | Full row data from Excel sheet, stored as JSON. |
+| status | VARCHAR(20) NOT NULL | Row processing status → PENDING, PASSED, FAILED. |
+| deleteTime | BIGINT | Expiry timestamp in epoch seconds. NULL = permanent row. |
+| createdBy | VARCHAR(100) | User/system who created the row. |
+| lastModifiedBy | VARCHAR(100) | User/system who last modified the row. |
+| createdTime | BIGINT | Row creation timestamp in epoch seconds, set by application. |
+| lastModifiedTime | BIGINT | Last modification timestamp in epoch seconds, set by application. |
+
+### Keys
+**Primary Key:** (referenceId, uniqueIdentifier, type)
+- Ensures uniqueness of rows per campaign/process per sheet type.
+
+### Purpose & Usage
+- **Staging Table:** Temporary storage of Excel sheet rows before final ingestion.
+- **Validation & Tracking:**
+  - Each row has a status → track validation or processing result.
+- **Temporary vs Permanent Rows:**
+  - deleteTime = NULL → row is permanent.
+  - deleteTime = epoch → row can be purged after that time.
+- **Row Data Flexibility:**
+  - rowData as JSONB allows storing arbitrary columns from Excel without altering table schema.
+
+### Example: SQL Create Table Script
+```sql
+CREATE TABLE eg_ex_in_sheet_data (
+    referenceId VARCHAR(100) NOT NULL,
+    uniqueIdentifier TEXT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    rowData JSONB NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    deleteTime BIGINT,            -- NULL = permanent
+    createdBy VARCHAR(100),
+    lastModifiedBy VARCHAR(100),
+    createdTime BIGINT,           -- epoch seconds, set by application
+    lastModifiedTime BIGINT,      -- epoch seconds, set by application
+    PRIMARY KEY (referenceId, uniqueIdentifier, type)
+);
+```
+
+
