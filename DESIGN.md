@@ -166,7 +166,24 @@ sequenceDiagram
     ExcelIngestionService-->>Client: SearchResponse<br/>(status, data based on type - referenceId (campaignId) for creation)
 ```
 
-## 6. Generated Files Table Documentation
+## 6. Sheet Data Search API
+**API:** `POST /v1/data/_searchData`
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant ExcelIngestionService
+    participant Database
+    
+    Client->>ExcelIngestionService: POST /v1/data/_searchData<br/>(referenceId, type, status, uniqueIdentifier, createdBy, limit, offset)
+    
+    ExcelIngestionService->>Database: Search Sheet Data<br/>(with filters + pagination)
+    Database-->>ExcelIngestionService: Records + Count
+    
+    ExcelIngestionService-->>Client: SearchDataResponse<br/>(data, totalCount)
+```
+
+## 7. Generated Files Table Documentation
 **Table Name:** `eg_ex_in_generated_files`
 
 This table stores metadata for all generated files (templates, validation reports, processed files) for download purposes.
@@ -234,7 +251,7 @@ CREATE INDEX idx_generated_files_status ON eg_ex_in_generated_files(status);
 ```
 
 
-## 7. Sheet Data Table Documentation
+## 8. Sheet Data Table Documentation
 **Table Name:** `eg_ex_in_sheet_data`
 
 This table provides row-wise temporary storage for the Excel ingestion workflow.
@@ -312,4 +329,24 @@ CREATE TABLE eg_ex_in_sheet_data (
 6. **Add Project-Mappings**: Add project-boundary mappings (PENDING, UniqueId: Boundary Code + Resource ID)
 7. **Create All**: Parallel creation - facilities + users + projects (together), then mappings (together) (PENDING → COMPLETED/FAILED)
 8. **Complete/Retry**: If all COMPLETED = success, if any FAILED = retry from PENDING items
+
+## Update Flow - Addition Only
+
+For campaign updates via Excel ingestion, **only addition of new data is supported**:
+
+- ✅ **Add new facilities** to existing campaign
+- ✅ **Add new users** to existing campaign  
+- ✅ **Add new projects** to existing campaign
+- ✅ **Add new mappings** (facility-boundary, user-boundary, project-resource)
+
+### Removal/Demapping Operations
+
+For **removal or demapping** operations, **UI-based approach is required**:
+
+- ❌ **Remove facility** from campaign → Use UI + Facility Demapping API
+- ❌ **Remove user** from campaign → Use UI + Staff Demapping API
+- ❌ **Remove project** from campaign → Use UI + Project Update API to make project inactive and parent null
+- ❌ **Demap resource** from campaign → Use UI + Resource Demapping API
+
+**Reason**: Demapping and removal operations require specific API calls that are better handled through UI workflows rather than bulk Excel processing.
 
