@@ -350,3 +350,5 @@ For **removal or demapping** operations, **UI-based approach is required**:
 
 **Reason**: Demapping and removal operations require specific API calls that are better handled through UI workflows rather than bulk Excel processing.
 
+**Note**: To know campaign data for UI display, use **Excel Ingestion Search API** (`POST /v1/data/_searchData`) to fetch and show existing facilities, users, projects, and mappings in the UI.
+
