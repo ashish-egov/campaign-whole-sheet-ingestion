@@ -175,7 +175,7 @@ This table stores metadata for all generated files (templates, validation report
 ```mermaid
 erDiagram
     eg_ex_in_generated_files {
-        VARCHAR(100) resourceId PK "Unique resource identifier"
+        VARCHAR(100) id PK "Unique resource identifier"
         VARCHAR(100) referenceId "Campaign/Process reference ID"
         VARCHAR(50) type "File type (template/validation-report/processed)"
         VARCHAR(200) fileStoreId "FileStore service ID for download"
@@ -192,7 +192,7 @@ erDiagram
 ### Column Details
 | Column | Type | Description |
 |--------|------|-------------|
-| resourceId | VARCHAR(100) PRIMARY KEY | Unique identifier for the generated resource |
+| id | VARCHAR(100) PRIMARY KEY | Unique identifier for the generated resource |
 | referenceId | VARCHAR(100) NOT NULL | Campaign or process reference ID |
 | type | VARCHAR(50) NOT NULL | Type of file (microplan-template/validation-report/processed-excel) |
 | fileStoreId | VARCHAR(200) | FileStore service ID for downloading the file |
@@ -214,7 +214,7 @@ erDiagram
 ### Example: SQL Create Table Script
 ```sql
 CREATE TABLE eg_ex_in_generated_files (
-    resourceId VARCHAR(100) PRIMARY KEY,
+    id VARCHAR(100) PRIMARY KEY,
     referenceId VARCHAR(100) NOT NULL,
     type VARCHAR(50) NOT NULL,
     fileStoreId VARCHAR(200),
