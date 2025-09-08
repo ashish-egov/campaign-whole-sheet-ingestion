@@ -187,37 +187,8 @@ erDiagram
         BIGINT createdTime "Creation epoch seconds"
         BIGINT lastModifiedTime "Last modified epoch"
     }
-    
-    eg_ex_in_sheet_data ||--o{ Campaign : "references"
-    eg_ex_in_sheet_data ||--o{ Process : "belongs to"
-    
-    Campaign {
-        VARCHAR(100) campaignId PK
-        VARCHAR name
-        VARCHAR status
-    }
-    
-    Process {
-        VARCHAR(100) processId PK
-        VARCHAR(100) referenceId FK
-        VARCHAR type
-        VARCHAR status
-    }
-```
 
-### Column Details
-| Column | Type | Description |
-|--------|------|-------------|
-| referenceId | VARCHAR(100) NOT NULL | Campaign or process reference ID (scope of ingestion). |
-| uniqueIdentifier | TEXT NOT NULL | Unique key per row (single/composite/custom). |
-| type | VARCHAR(50) NOT NULL | Sheet type (e.g., Facility, User, Target). |
-| rowData | JSONB NOT NULL | Full row data from Excel sheet, stored as JSON. |
-| status | VARCHAR(20) NOT NULL | Row processing status → PENDING, FAILED, COMPLETED. |
-| deleteTime | BIGINT | Expiry timestamp in epoch seconds. NULL = permanent row. |
-| createdBy | VARCHAR(100) | User/system who created the row. |
-| lastModifiedBy | VARCHAR(100) | User/system who last modified the row. |
-| createdTime | BIGINT | Row creation timestamp in epoch seconds, set by application. |
-| lastModifiedTime | BIGINT | Last modification timestamp in epoch seconds, set by application. |
+```
 
 ### Keys
 **Primary Key:** (referenceId, uniqueIdentifier, type)
