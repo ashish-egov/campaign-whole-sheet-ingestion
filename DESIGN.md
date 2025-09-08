@@ -233,6 +233,7 @@ CREATE INDEX idx_generated_files_type ON eg_ex_in_generated_files(type);
 CREATE INDEX idx_generated_files_status ON eg_ex_in_generated_files(status);
 ```
 
+
 ## 7. Sheet Data Table Documentation
 **Table Name:** `eg_ex_in_sheet_data`
 
@@ -301,4 +302,14 @@ CREATE TABLE eg_ex_in_sheet_data (
 );
 ```
 
+
+### Process Steps:
+1. **Process Sheet**: Extract all data from unified sheet
+2. **Add Facilities**: Add new facilities (PENDING, UniqueId: Facility Name)
+3. **Add Facility-Mappings**: Add facility-boundary mappings (PENDING, UniqueId: Facility Name + Boundary Code)
+4. **Add Users**: Add users (PENDING, UniqueId: Mobile Number)  
+5. **Add Projects**: Add projects (PENDING, UniqueId: Boundary Code)
+6. **Add Project-Mappings**: Add project-boundary mappings (PENDING, UniqueId: Boundary Code + Resource ID)
+7. **Create All**: Parallel creation - facilities + users + projects (together), then mappings (together) (PENDING → COMPLETED/FAILED)
+8. **Complete/Retry**: If all COMPLETED = success, if any FAILED = retry from PENDING items
 
