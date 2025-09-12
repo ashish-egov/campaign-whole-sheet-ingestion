@@ -1,27 +1,29 @@
-    subgraph P[Project Creation (Level-wise)]
-        direction TB
+flowchart TD
+
+    Start((Start))
+
+    %% Project creation
+    subgraph ProjectCreation [Project Creation - Levels in Parallel]
+        direction LR
         L1["Level 1 → 20 parallel batches"]
         L2["Level 2 → 20 parallel batches"]
-        L3["Level N → 20 parallel batches"]
-        L1 --> L2 --> L3
+        L3["Level 3 → 20 parallel batches"]
     end
 
-    subgraph F[Facility Creation]
-        F1["20 parallel batches"]
-    end
+    %% Facility creation
+    FacilityCreation["Facility Creation → 20 parallel batches"]
 
-    subgraph U[User Bulk Creation (Promise.all 5 batches)]
-        direction LR
-        U1["Batch 1 (50 users)"]
-        U2["Batch 2 (50 users)"]
-        U3["Batch 3 (50 users)"]
-        U4["Batch 4 (50 users)"]
-        U5["Batch 5 (50 users)"]
-    end
+    %% User creation simplified
+    UserCreation["User Bulk Creation → 5 batches with 50 users each"]
 
-    subgraph M[Mappings]
-        M1["50 parallel mapping batches"]
-    end
+    %% Merge point
+    Merge((Merge All))
 
-    %% Flow connections
-    P --> F --> U --> M
+    %% Mappings
+    M1["Mappings → 50 parallel mapping batches"]
+
+    %% Connections
+    Start --> ProjectCreation --> Merge
+    Start --> FacilityCreation --> Merge
+    Start --> UserCreation --> Merge
+    Merge --> M1
