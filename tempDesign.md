@@ -1,5 +1,3 @@
-flowchart TD
-
     subgraph P[Project Creation (Level-wise)]
         direction TB
         L1["Level 1 → 20 parallel batches"]
@@ -12,19 +10,18 @@ flowchart TD
         F1["20 parallel batches"]
     end
 
-    subgraph U[User Bulk Creation]
+    subgraph U[User Bulk Creation (Promise.all 5 batches)]
+        direction LR
         U1["Batch 1 (50 users)"]
         U2["Batch 2 (50 users)"]
         U3["Batch 3 (50 users)"]
         U4["Batch 4 (50 users)"]
         U5["Batch 5 (50 users)"]
-
-        U1 & U2 & U3 & U4 & U5
     end
 
     subgraph M[Mappings]
         M1["50 parallel mapping batches"]
     end
 
-    %% Flow
+    %% Flow connections
     P --> F --> U --> M
