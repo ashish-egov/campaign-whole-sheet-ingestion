@@ -1,27 +1,31 @@
-Start((Start))
+```mermaid
+flowchart TD
 
-%% Project creation
-subgraph ProjectCreation [Project Creation - Levels in Parallel]
-    direction LR
-    L1["Level 1 → 20 parallel batches"]
-    L2["Level 2 → 20 parallel batches"]
-    L3["Level 3 → 20 parallel batches"]
-end
+    Start((Start))
 
-%% Facility creation
-FacilityCreation["Facility Creation → 20 parallel batches"]
+    %% Project creation
+    subgraph ProjectCreation [Project Creation - Levels in Parallel]
+        direction LR
+        L1["Level 1 → 20 parallel batches"]
+        L2["Level 2 → 20 parallel batches"]
+        L3["Level 3 → 20 parallel batches"]
+    end
 
-%% User creation simplified
-UserCreation["User Bulk Creation → 5 batches with 50 users each"]
+    %% Facility creation
+    FacilityCreation["Facility Creation → 20 parallel batches"]
 
-%% Merge point
-Merge((Merge All))
+    %% User creation simplified
+    UserCreation["User Bulk Creation → 5 batches with 50 users each"]
 
-%% Mappings
-M1["Mappings → 50 parallel mapping batches"]
+    %% Merge point
+    Merge((Merge All))
 
-%% Connections
-Start --> ProjectCreation --> Merge
-Start --> FacilityCreation --> Merge
-Start --> UserCreation --> Merge
-Merge --> M1
+    %% Mappings
+    M1["Mappings → 50 parallel mapping batches"]
+
+    %% Connections
+    Start --> ProjectCreation --> Merge
+    Start --> FacilityCreation --> Merge
+    Start --> UserCreation --> Merge
+    Merge --> M1
+```
