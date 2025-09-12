@@ -18,7 +18,7 @@ flowchart TD
     UserCreation["User Bulk Creation → 5 batches with 50 users each"]
 
     %% Merge point
-    Merge((Merge All))
+    Merge((Promise All))
 
     %% Mappings
     M1["Mappings → 50 parallel mapping batches"]
